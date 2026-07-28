@@ -53,10 +53,16 @@ h1 {
 }
 
 #gallery a {
-  height: 220px;
+  height: 130px;
   overflow: hidden;
   background: #222;
   cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  #gallery a {
+    height: 220px;
+  }
 }
 
 #gallery img {
