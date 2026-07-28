@@ -75,7 +75,10 @@ async function fetchAlbumAssets(albumId) {
 
 // --- Download helpers ---
 async function downloadBinary(apiPath, destFile) {
-  const res = await immichFetch(apiPath, { headers: { Accept: 'image/*' } });
+  const res = await fetch(`${IMMICH_URL}${apiPath}`, {
+    headers: { 'x-api-key': IMMICH_API_KEY, Accept: 'image/*' },
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
   await pipeline(res.body, createWriteStream(destFile));
 }
 
@@ -107,20 +110,33 @@ async function main() {
 
   // Download images
   let done = 0;
+  const failed = [];
+  const succeeded = [];
   await pMap(images, async (asset) => {
     const thumbDest = path.join(DIST, 'thumbs', `${asset.id}.jpg`);
     const imageDest = path.join(DIST, 'images', `${asset.id}.jpg`);
-    await Promise.all([
-      downloadBinary(`/api/assets/${asset.id}/thumbnail?size=thumbnail`, thumbDest),
-      downloadBinary(`/api/assets/${asset.id}/thumbnail?size=preview`, imageDest),
-    ]);
+    try {
+      await Promise.all([
+        downloadBinary(`/api/assets/${asset.id}/thumbnail?size=thumbnail`, thumbDest),
+        downloadBinary(`/api/assets/${asset.id}/thumbnail?size=preview`, imageDest),
+      ]);
+      succeeded.push(asset);
+    } catch (err) {
+      failed.push({ asset, err });
+    }
     done++;
     process.stdout.write(`\r  ${done}/${images.length}`);
   });
+  if (failed.length) {
+    console.log(`\nÜbersprungen (${failed.length} Fehler):`);
+    for (const { asset, err } of failed) {
+      console.warn(`  ${asset.id} (${asset.originalFileName}): ${err.message}`);
+    }
+  }
   console.log();
 
   // Build gallery items HTML
-  const items = images.map((asset) => {
+  const items = succeeded.map((asset) => {
     // width/height sind direkte Felder in dieser Immich-Version
     const w = asset.width ?? '';
     const h = asset.height ?? '';
@@ -139,7 +155,7 @@ async function main() {
     .replace('{{GALLERY_ITEMS}}', items.join('\n    '));
 
   await writeFile(path.join(DIST, 'index.html'), html, 'utf-8');
-  console.log(`Fertig: dist/index.html mit ${images.length} Fotos.`);
+  console.log(`Fertig: dist/index.html mit ${succeeded.length} Fotos.`);
 }
 
 main().catch((err) => { console.error(err); process.exit(1); });
