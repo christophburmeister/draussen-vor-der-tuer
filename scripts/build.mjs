@@ -107,6 +107,7 @@ async function main() {
   await mkdir(path.join(DIST, 'images'), { recursive: true });
   await mkdir(path.join(DIST, 'thumbs'), { recursive: true });
   await copyFile(path.join(SRC, 'styles.css'), path.join(DIST, 'styles.css'));
+  await copyFile(path.join(SRC, 'header.jpg'), path.join(DIST, 'header.jpg'));
 
   // Download images
   let done = 0;
