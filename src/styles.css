@@ -59,7 +59,7 @@ h1 {
   cursor: pointer;
 }
 
-@media (max-width: 900px) {
+@media (min-width: 900px) {
   #gallery a {
     height: 220px;
   }
