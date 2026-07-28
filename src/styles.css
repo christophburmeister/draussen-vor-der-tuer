@@ -10,15 +10,32 @@ body {
 }
 
 header {
-  padding: 2rem 1.5rem 1rem;
-  text-align: center;
+  position: relative;
+  width: 100%;
+  height: 40vh;
+  min-height: 220px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 h1 {
+  position: relative;
   margin: 0;
-  font-size: 1.8rem;
-  font-weight: 400;
-  letter-spacing: 0.05em;
+  font-size: 2.4rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.7);
 }
 
 #gallery {
