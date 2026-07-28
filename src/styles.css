@@ -22,14 +22,13 @@ h1 {
 }
 
 #gallery {
-  columns: 220px;
-  column-gap: 4px;
   padding: 1rem;
+  margin: 0 auto;
 }
 
 #gallery a {
   display: block;
-  break-inside: avoid;
+  width: 220px;
   margin-bottom: 4px;
   overflow: hidden;
   background: #222;
