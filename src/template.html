@@ -34,6 +34,11 @@
     const gallery = document.getElementById('gallery');
 
     lightGallery(gallery, {
+        mobileSettings: {
+        controls: true,
+        showCloseIcon: true,
+        download: false
+      },
       plugins: [lgThumbnail, lgZoom],
       speed: 400,
       thumbnail: true,
