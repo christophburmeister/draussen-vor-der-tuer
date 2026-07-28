@@ -95,7 +95,7 @@ async function main() {
 
   console.log('Lade Album-Assets…');
   const images = (await fetchAlbumAssets(albumId))
-    .sort((a, b) => new Date(a.fileCreatedAt) - new Date(b.fileCreatedAt));
+    .sort((a, b) => new Date(b.fileCreatedAt) - new Date(a.fileCreatedAt));
 
   console.log(`${images.length} Bilder gefunden.`);
 
