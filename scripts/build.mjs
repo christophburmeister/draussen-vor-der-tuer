@@ -54,6 +54,25 @@ async function resolveAlbumId() {
   return match.id;
 }
 
+async function fetchAlbumAssets(albumId) {
+  const assets = [];
+  let page = 1;
+  while (true) {
+    const res = await immichFetch('/api/search/metadata', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ albumIds: [albumId], type: 'IMAGE', size: 1000, page }),
+    });
+    const data = await res.json();
+    const items = data.assets?.items ?? [];
+    assets.push(...items);
+    const nextPage = data.assets?.nextPage;
+    if (!nextPage || typeof nextPage !== 'number') break;
+    page = nextPage;
+  }
+  return assets;
+}
+
 // --- Download helpers ---
 async function downloadBinary(apiPath, destFile) {
   const res = await immichFetch(apiPath, { headers: { Accept: 'image/*' } });
@@ -74,10 +93,8 @@ async function pMap(items, fn) {
 async function main() {
   const albumId = await resolveAlbumId();
 
-  console.log('Lade Album-Details…');
-  const album = await immichJson(`/api/albums/${albumId}`);
-  const images = (album.assets ?? [])
-    .filter(a => a.type === 'IMAGE')
+  console.log('Lade Album-Assets…');
+  const images = (await fetchAlbumAssets(albumId))
     .sort((a, b) => new Date(a.fileCreatedAt) - new Date(b.fileCreatedAt));
 
   console.log(`${images.length} Bilder gefunden.`);
@@ -104,8 +121,9 @@ async function main() {
 
   // Build gallery items HTML
   const items = images.map((asset) => {
-    const w = asset.exifInfo?.exifImageWidth ?? '';
-    const h = asset.exifInfo?.exifImageHeight ?? '';
+    // width/height sind direkte Felder in dieser Immich-Version
+    const w = asset.width ?? '';
+    const h = asset.height ?? '';
     const sizeAttr = w && h ? ` data-lg-size="${w}-${h}"` : '';
     const alt = (asset.originalFileName ?? '').replace(/"/g, '&quot;');
     return (
