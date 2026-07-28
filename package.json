@@ -1,0 +1,10 @@
+{
+  "name": "draussen-vor-der-tuer",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

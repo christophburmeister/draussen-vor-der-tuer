@@ -1,0 +1,48 @@
+name: Build & Deploy Gallery
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build gallery
+        run: node scripts/build.mjs
+        env:
+          IMMICH_URL: ${{ vars.IMMICH_URL }}
+          IMMICH_API_KEY: ${{ secrets.IMMICH_API_KEY }}
+          # Exactly one of ALBUM_ID or ALBUM_NAME must be set:
+          ALBUM_ID: ${{ vars.ALBUM_ID }}
+          ALBUM_NAME: ${{ vars.ALBUM_NAME }}
+          GALLERY_TITLE: ${{ vars.GALLERY_TITLE }}
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4
