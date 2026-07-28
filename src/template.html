@@ -24,19 +24,14 @@
   <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/lightgallery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/plugins/thumbnail/lg-thumbnail.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/plugins/zoom/lg-zoom.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js"></script>
+  <script>
+    document.querySelectorAll('#gallery a[data-lg-size]').forEach(a => {
+      const [w, h] = a.dataset.lgSize.split('-').map(Number);
+      if (w && h) a.style.flexGrow = (w / h).toFixed(4);
+    });
+  </script>
   <script>
     const gallery = document.getElementById('gallery');
-
-    imagesLoaded(gallery, function () {
-      new Masonry(gallery, {
-        itemSelector: '#gallery a',
-        columnWidth: 220,
-        gutter: 4,
-        fitWidth: true,
-      });
-    });
 
     lightGallery(gallery, {
       plugins: [lgThumbnail, lgZoom],
